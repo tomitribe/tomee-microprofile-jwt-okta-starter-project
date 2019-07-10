@@ -19,6 +19,7 @@ package org.superbiz;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -38,15 +39,21 @@ public class MovieService {
     private Map<Integer, Movie> store = new ConcurrentHashMap<>();
 
     @GET
-    @RolesAllowed({"manager", "user"})
+    @RolesAllowed({"manager", "user", "Everyone"})
     public List<Movie> getAllMovies() {
         return new ArrayList<>(store.values());
     }
 
     @POST
-    @RolesAllowed("manager")
+    @RolesAllowed({"manager", "Everyone"})
     public void addMovie(Movie newMovie) {
         store.put(newMovie.getId(), newMovie);
+    }
+
+    @DELETE
+    @RolesAllowed({"manager"})
+    public void deleteAllMovies() {
+        store.clear();
     }
 
 }

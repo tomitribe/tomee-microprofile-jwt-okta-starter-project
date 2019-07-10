@@ -47,48 +47,53 @@ public class MovieServiceTest {
     private URL base;
 
     @Test
-    public void testAsManager() throws Exception {
+    public void testAsEveryone() throws Exception {
         final WebClient webClient = createWebClient(base);
 
         final Movie movie = new Movie(1, "The Matrix", "Lana Wachowski");
 
-        final String claims = "{" +
-                "  \"sub\":\"Jane Awesome\"," +
-                "  \"iss\":\"https://server.example.com\"," +
-                "  \"groups\":[\"manager\",\"user\"]," +
-                "  \"exp\":2552047942" +
-                "}";
+        final String jwt = "eyJraWQiOiI3M1dmMFBMVFpLUEZFWWQ1X1hLY0JKcHc0VUh1M0FXNWpSY2tiam1JZ1RVIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULi1sWjZqZkY2U3N5c0tDRXJFVXFLWUxIYjhuaS1mUkdpdHlUUnI0ZjF0RWsiLCJpc3MiOiJodHRwczovL2Rldi0xMzMzMjAub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNTYyNzk5ODIxLCJleHAiOjE1NjI4MDM0MjEsImNpZCI6IjBvYXVwMmc0ZWlBYmNWU3FpMzU2IiwidWlkIjoiMDB1dmw1MHpqVWt3UXNGWHAzNTYiLCJzY3AiOlsib3BlbmlkIl0sInN1YiI6ImRibGV2aW5zQHRvbWl0cmliZS5jb20iLCJ1cG4iOiJkYmxldmluc0B0b21pdHJpYmUuY29tIiwiZ3JvdXBzIjpbIkV2ZXJ5b25lIl19.bsO6ppwATRWvxJOGnGRvoae6MzdThMajirT2u4CEjG5_U4cpeBc98xIUDExGr-c32km5cESU6qVbsrgCyRvyGg9dqVdOHWxlDYM1w6A3T0RlhhfFlzIC8HW1KzY4MHP7TFxURUkfnup_XtmWQfhMbvHZJVaDQkD5ZpBFcgOdfVFX2rkFpTRAJdBYELFUGh0ddqFoIXkDCtW0GFetNnfHGL2_YjpI52ZbfSPY0AV1C8f461MkMUnCXRLnGE0DfX2S_KGtGTaR1gPYPretg9j8zfeNUhk5RktjyMeJ9N6JzrUVotVo-SbpOOFHQDEB6wR38l-3GcUyYNztUAuP9ZXh_w";
 
         final Response response = webClient.reset()
                 .path("/api/movies")
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + Tokens.asToken(claims))
+                .header("Authorization", "Bearer " + jwt)
                 .post(movie);
         assertEquals(204, response.getStatus());
 
     }
 
-    /**
-     * User does not have sufficient permission to addMovie
-     */
     @Test
-    public void testAsUser() throws Exception {
+    public void testInvalidToken() throws Exception {
         final WebClient webClient = createWebClient(base);
 
-        final Movie movie = new Movie(2, "Reservoir Dogs", "Quentin Tarantino");
+        final Movie movie = new Movie(1, "The Matrix", "Lana Wachowski");
 
-        final String claims = "{" +
-                "  \"sub\":\"Joe Cool\"," +
-                "  \"iss\":\"https://server.example.com\"," +
-                "  \"groups\":[\"user\"]," +
-                "  \"exp\":2552047942" +
-                "}";
+        final String jwt = "eyJraWQiOiI3M1dmMFBMVFpLUEZFWWQ1X1hLY0JKcHc0VUh1M0FXNWpSY2tiam1JZ1RVIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULi1sWjZqZkY2U3N5c0tDRXJFVXFLWUxIYjhuaS1mUkdpdHlUUnI0ZjF0RWsiLCJpc3MiOiJodHRwczovL2Rldi0xMzMzMjAub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNTYyNzk5ODIxLCJleHAiOjE1NjI4MDM0MjEsImNpZCI6IjBvYXVwMmc0ZWlBYmNWU3FpMzU2IiwidWlkIjoiMDB1dmw1MHpqVWt3UXNGWHAzNTYiLCJzY3AiOlsib3BlbmlkIl0sInN1YiI6ImRibGV2aW5zQHRvbWl0cmliZS5jb20iLCJ1cG4iOiJkYmxldmluc0B0b21pdHJpYmUuY29tIiwiZ3JvdXBzIjpbIkV2ZXJ5b25lIl19.bsO6ppwATRWvxJOGnGRvoae6MzdThMajirT2u4CEjG5_U4cpeBc98xIUDExGr-c32km5cESU6qVbsrgCyRvyGg9dqVdOHWxlDYM1w6A3T0RlhhfFlzIC8HW1KzY4MHP7TFxURUkfnup_XtmWQfhMbvHZJVaDQkD5ZpBFcgOdfVFX2rkFpTRAJdBYELFUGh0ddqFoIXkDCtW0GFetNnfHGL2_YjpI52ZbfSPY0AV1C8f461MkMUnCXRLnGE0DfX2S_KGtGTaR1gPYPretg9j8zfeNUhk5RktjyMeJ9N6JzrUVotVo";
 
         final Response response = webClient.reset()
                 .path("/api/movies")
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + Tokens.asToken(claims))
+                .header("Authorization", "Bearer " + jwt)
                 .post(movie);
+        assertEquals(401, response.getStatus());
+
+    }
+
+    /**
+     * The JWT has "Everyone" permission and cannot delete all the movies
+     */
+    @Test
+    public void testManagerRequired() throws Exception {
+        final WebClient webClient = createWebClient(base);
+
+        final String jwt = "eyJraWQiOiI3M1dmMFBMVFpLUEZFWWQ1X1hLY0JKcHc0VUh1M0FXNWpSY2tiam1JZ1RVIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULi1sWjZqZkY2U3N5c0tDRXJFVXFLWUxIYjhuaS1mUkdpdHlUUnI0ZjF0RWsiLCJpc3MiOiJodHRwczovL2Rldi0xMzMzMjAub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNTYyNzk5ODIxLCJleHAiOjE1NjI4MDM0MjEsImNpZCI6IjBvYXVwMmc0ZWlBYmNWU3FpMzU2IiwidWlkIjoiMDB1dmw1MHpqVWt3UXNGWHAzNTYiLCJzY3AiOlsib3BlbmlkIl0sInN1YiI6ImRibGV2aW5zQHRvbWl0cmliZS5jb20iLCJ1cG4iOiJkYmxldmluc0B0b21pdHJpYmUuY29tIiwiZ3JvdXBzIjpbIkV2ZXJ5b25lIl19.bsO6ppwATRWvxJOGnGRvoae6MzdThMajirT2u4CEjG5_U4cpeBc98xIUDExGr-c32km5cESU6qVbsrgCyRvyGg9dqVdOHWxlDYM1w6A3T0RlhhfFlzIC8HW1KzY4MHP7TFxURUkfnup_XtmWQfhMbvHZJVaDQkD5ZpBFcgOdfVFX2rkFpTRAJdBYELFUGh0ddqFoIXkDCtW0GFetNnfHGL2_YjpI52ZbfSPY0AV1C8f461MkMUnCXRLnGE0DfX2S_KGtGTaR1gPYPretg9j8zfeNUhk5RktjyMeJ9N6JzrUVotVo-SbpOOFHQDEB6wR38l-3GcUyYNztUAuP9ZXh_w";
+
+        final Response response = webClient.reset()
+                .path("/api/movies")
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + jwt)
+                .delete();
         assertEquals(403, response.getStatus());
     }
 
